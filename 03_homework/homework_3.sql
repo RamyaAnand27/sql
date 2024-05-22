@@ -15,16 +15,13 @@ of customers for them to give stickers to, sorted by last name, then first name.
 
 HINT: This query requires you to join two tables, use an aggregate function, and use the HAVING keyword. */
 
-SELECT customer_last_name, customer_first_name, purchase_total
+SELECT customer.customer_id, customer_last_name, customer_first_name, sum(cost_to_customer_per_qty * quantity) purchase_total
 FROM customer
 JOIN
-(
-SELECT customer_id, sum(cost_to_customer_per_qty * quantity) purchase_total
-FROM customer_purchases
-GROUP BY customer_id
+customer_purchases
+ON customer.customer_id = customer_purchases.customer_id
+GROUP BY customer_purchases.customer_id
 HAVING sum(cost_to_customer_per_qty * quantity) > 2000
-) AS qualified_purchase
-ON customer.customer_id = qualified_purchase.customer_id
 ORDER BY customer_last_name, customer_first_name
 
 --Temp Table
@@ -61,4 +58,4 @@ but remember, STRFTIME returns a STRING for your WHERE statement!! */
 SELECT customer_id, strftime('%Y', market_date) year, strftime('%m', market_date) month, SUM (cost_to_customer_per_qty * quantity) AS total
 FROM customer_purchases 
 WHERE month = '04' and year = '2019'
-GROUP BY customer_id
+GROUP BY customer_id, year, month
